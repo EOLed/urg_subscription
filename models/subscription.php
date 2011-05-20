@@ -15,6 +15,7 @@ class Subscription extends AppModel {
 		'email' => array(
 			'email' => array(
 				'rule' => array('email'),
+                "message" => "Please enter a valid email."
 				//'message' => 'Your custom message here',
 				//'allowEmpty' => false,
 				//'required' => false,

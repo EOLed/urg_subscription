@@ -1,0 +1,41 @@
+#SubscriptionEmail {
+    width: 80%;
+}
+
+#subscription-indicator {
+    padding-left: 5px;
+}
+
+#subscription-help {
+    clear: both;
+    font-style: italic;
+}
+
+.subscription-widget {
+    padding: 5px;
+    background-color: #eee;
+
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.subscription-header {
+    padding-bottom: 5px;
+    font-weight: 500;
+    color: #222;
+    text-shadow: 0px 2px 3px #fff;
+}
+
+#subscription-form .input {
+    padding-bottom: 5px;
+}
+
+#subscription-message {
+    padding: 5px 0 5px 0;
+    color: #444;
+}
+
+#subscription-errors {
+    color: #ff0000;
+}
