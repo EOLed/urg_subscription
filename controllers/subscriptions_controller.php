@@ -38,6 +38,7 @@ class SubscriptionsController extends AppController {
 
 		if (!empty($this->data)) {
 			$this->Subscription->create();
+            $this->data["Subscription"]["ref"] = String::uuid();
 			if ($this->Subscription->save($this->data)) {
 				$message = __('Thanks for subscribing!', true);
 			} else {

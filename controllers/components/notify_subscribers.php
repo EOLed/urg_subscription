@@ -5,7 +5,7 @@ class NotifySubscribersComponent extends Object {
 
     var $controller = null;
     var $settings = null;
-    var $components = array("Email", "ImgLib");
+    var $components = array("Email", "ImgLib", "FlyLoader");
 
     var $email_delivery;
 
@@ -51,6 +51,10 @@ class NotifySubscribersComponent extends Object {
 
             $this->controller->set("banner", $banners[0]);
             $this->controller->set("post", $this->controller->data);
+
+            $this->controller->set("subscription", $subscription);
+
+            $this->FlyLoader->load("Helper", "HtmlText");
 
             if ($this->email_delivery == "smtp") {
                 $this->Email->smtpOptions = array(
