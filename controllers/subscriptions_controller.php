@@ -30,6 +30,10 @@ class SubscriptionsController extends AppController {
 		$this->set(compact('groups'));
 	}
 
+    function unsubscribe($ref) {
+        $this->Subscription->deleteAll(array("Subscription.ref" => $ref));
+    }
+
     function subscribe() {
         $this->layout = "ajax";
         $errors = array();
