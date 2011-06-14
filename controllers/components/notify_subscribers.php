@@ -49,7 +49,10 @@ class NotifySubscribersComponent extends Object {
 
             $this->Email->sendAs = "both";
 
-            $this->controller->set("banner", $banners[0]);
+            if (sizeof($banners) > 0) {
+                $this->controller->set("banner", $banners[0]);
+            }
+
             $this->controller->set("post", $this->controller->data);
 
             $this->controller->set("subscription", $subscription);
