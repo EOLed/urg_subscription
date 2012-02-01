@@ -35,17 +35,19 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
         Configure::load("config");
 
         foreach ($subscriptions as $subscription) {
-            $this->Email->to = $subscription["Subscription"]["email"];
-            $this->Email->from = "no-reply@churchie.org";
-            $this->Email->subject = $this->controller->data["Post"]["title"];
+            $this->controller->FlyLoader->load("Helper", "HtmlText");
+            $this->controller->FlyLoader->load("Component", "Email");
+            $this->controller->Email->to = $subscription["Subscription"]["email"];
+            $this->controller->Email->from = "no-reply@churchie.org";
+            $this->controller->Email->subject = $this->controller->data["Post"]["title"];
 
-            $this->Email->delivery = $this->email_delivery;
-            $this->Email->template = "banner";
+            $this->controller->Email->delivery = $this->email_delivery;
+            $this->controller->Email->template = "banner";
 
-            $this->Email->sendAs = "both";
+            $this->controller->Email->sendAs = "both";
 
             if (isset($this->widget_settings["reply_to"])) {
-                $this->Email->replyTo = $this->widget_settings["reply_to"];
+                $this->controller->Email->replyTo = $this->widget_settings["reply_to"];
             }
 
             if (sizeof($banners) > 0) {
@@ -56,10 +58,8 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
 
             $this->controller->set("subscription", $subscription);
 
-            $this->FlyLoader->load("Helper", "HtmlText");
-
             if ($this->email_delivery == "smtp") {
-                $this->Email->smtpOptions = array(
+                $this->controller->Email->smtpOptions = array(
                         "port" => Configure::read("Email.smtpPort"),
                         "timeout" => Configure::read("Email.smtpTimeout"),
                         "host" => Configure::read("Email.smtpHost"),
@@ -67,8 +67,8 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
                         "password" => Configure::read("Email.smtpPassword")
                 );
             }
-            $this->Email->send();
-            $this->Email->reset();
+            $this->controller->Email->send();
+            $this->controller->Email->reset();
         }
     }
 
@@ -95,8 +95,10 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
     }
 
     function get_image_path($filename, $post, $width, $height = 0) {
+        $this->controller->FlyLoader->load("Component", "ImgLib.ImgLib");
+        
         $full_image_path = $this->get_doc_root($this->IMAGES) . "/" .  $post["Post"]["id"];
-        $image = $this->ImgLib->get_image("$full_image_path/$filename", $width, $height, 'landscape'); 
+        $image = $this->controller->ImgLib->get_image("$full_image_path/$filename", $width, $height, 'landscape'); 
         return "/urg_post/img/" . $post["Post"]["id"] . "/" . $image["filename"];
     }
 
