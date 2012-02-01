@@ -38,7 +38,11 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
             $this->controller->FlyLoader->load("Helper", "HtmlText");
             $this->controller->FlyLoader->load("Component", "Email");
             $this->controller->Email->to = $subscription["Subscription"]["email"];
-            $this->controller->Email->from = "no-reply@churchie.org";
+            $from = "no-reply@churchie.org";
+            if (isset($this->widget_settings["reply_to_name"])) {
+                $from = $this->widget_settings["reply_to_name"] . " <$from>";
+            }
+            $this->controller->Email->from = $from;
             $this->controller->Email->subject = $this->controller->data["Post"]["title"];
 
             $this->controller->Email->delivery = $this->email_delivery;
