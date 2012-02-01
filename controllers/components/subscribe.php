@@ -1,14 +1,6 @@
 <?php
 App::import("Lib", "Urg.AbstractWidgetComponent");
 class SubscribeComponent extends AbstractWidgetComponent  {
-    var $controller = null;
-    var $settings = null;
-
-    function initialize(&$controller, $settings = array()) {
-        $this->controller =& $controller;
-        $this->settings = $settings;
-    }
-
     function build_widget() {
         $settings = $this->widget_settings;
 

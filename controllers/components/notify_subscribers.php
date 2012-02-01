@@ -1,26 +1,21 @@
 <?php
+App::import("Component", "FlyLoader");
+App::import("Lib", "Urg.AbstractWidgetComponent");
 App::import("Component", "ImgLib.ImgLib");
-class NotifySubscribersComponent extends Object {
+class NotifySubscribersComponent extends AbstractWidgetComponent {
     var $IMAGES = "/app/plugins/urg_post/webroot/img";
 
-    var $controller = null;
-    var $settings = null;
     var $components = array("Email", "ImgLib", "FlyLoader");
 
     var $email_delivery;
 
-    function initialize(&$controller, $settings = array()) {
-        $this->controller =& $controller;
-        $this->settings = $settings;
-
+    function build_widget() {
+        Configure::load("config");
         $this->email_delivery = Configure::read("Email.delivery");
 
         if ($this->email_delivery == "" || $this->email_delivery == null) {
             $this->email_delivery = "mail";
         }
-    }
-
-    function build($widget_id) {
     }
     
     function execute() {
@@ -41,13 +36,17 @@ class NotifySubscribersComponent extends Object {
 
         foreach ($subscriptions as $subscription) {
             $this->Email->to = $subscription["Subscription"]["email"];
-            $this->Email->from = "test@churchie.org";
+            $this->Email->from = "no-reply@churchie.org";
             $this->Email->subject = $this->controller->data["Post"]["title"];
 
             $this->Email->delivery = $this->email_delivery;
             $this->Email->template = "banner";
 
             $this->Email->sendAs = "both";
+
+            if (isset($this->widget_settings["reply_to"])) {
+                $this->Email->replyTo = $this->widget_settings["reply_to"];
+            }
 
             if (sizeof($banners) > 0) {
                 $this->controller->set("banner", $banners[0]);
