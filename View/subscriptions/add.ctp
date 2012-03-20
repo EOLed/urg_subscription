@@ -1,18 +1,18 @@
 <div class="subscriptions form">
 <?php echo $this->Form->create('Subscription');?>
 	<fieldset>
- 		<legend><?php __('Add Subscription'); ?></legend>
+ 		<legend><?php echo __('Add Subscription'); ?></legend>
 	<?php
 		echo $this->Form->input('group_id');
 		echo $this->Form->input('email');
 	?>
 	</fieldset>
-<?php echo $this->Form->end(__('Submit', true));?>
+<?php echo $this->Form->end(__('Submit'));?>
 </div>
 <div class="actions">
-	<h3><?php __('Actions'); ?></h3>
+	<h3><?php echo __('Actions'); ?></h3>
 	<ul>
 
-		<li><?php echo $this->Html->link(__('List Subscriptions', true), array('action' => 'index'));?></li>
+		<li><?php echo $this->Html->link(__('List Subscriptions'), array('action' => 'index'));?></li>
 	</ul>
 </div>

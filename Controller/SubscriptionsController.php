@@ -10,7 +10,7 @@ class SubscriptionsController extends AppController {
 
 	function view($id = null) {
 		if (!$id) {
-			$this->Session->setFlash(__('Invalid subscription', true));
+			$this->Session->setFlash(__('Invalid subscription'));
 			$this->redirect(array('action' => 'index'));
 		}
 		$this->set('subscription', $this->Subscription->read(null, $id));
@@ -20,10 +20,10 @@ class SubscriptionsController extends AppController {
 		if (!empty($this->data)) {
 			$this->Subscription->create();
 			if ($this->Subscription->save($this->data)) {
-				$this->Session->setFlash(__('The subscription has been saved', true));
+				$this->Session->setFlash(__('The subscription has been saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {
-				$this->Session->setFlash(__('The subscription could not be saved. Please, try again.', true));
+				$this->Session->setFlash(__('The subscription could not be saved. Please, try again.'));
 			}
 		}
 		$groups = $this->Subscription->Group->find('list');
@@ -44,11 +44,11 @@ class SubscriptionsController extends AppController {
 			$this->Subscription->create();
             $this->data["Subscription"]["ref"] = String::uuid();
 			if ($this->Subscription->save($this->data)) {
-				$message = __('Thanks for subscribing!', true);
+				$message = __('Thanks for subscribing!');
 			} else {
                 $errors = $this->Subscription->invalidFields();
                 foreach ($errors as $error_key=>$error_message) {
-                    $i18n_errors[$error_key] = __($error_message, true);
+                    $i18n_errors[$error_key] = __($error_message);
                 }
 			}
 
@@ -66,15 +66,15 @@ class SubscriptionsController extends AppController {
 
 	function edit($id = null) {
 		if (!$id && empty($this->data)) {
-			$this->Session->setFlash(__('Invalid subscription', true));
+			$this->Session->setFlash(__('Invalid subscription'));
 			$this->redirect(array('action' => 'index'));
 		}
 		if (!empty($this->data)) {
 			if ($this->Subscription->save($this->data)) {
-				$this->Session->setFlash(__('The subscription has been saved', true));
+				$this->Session->setFlash(__('The subscription has been saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {
-				$this->Session->setFlash(__('The subscription could not be saved. Please, try again.', true));
+				$this->Session->setFlash(__('The subscription could not be saved. Please, try again.'));
 			}
 		}
 		if (empty($this->data)) {
@@ -86,14 +86,14 @@ class SubscriptionsController extends AppController {
 
 	function delete($id = null) {
 		if (!$id) {
-			$this->Session->setFlash(__('Invalid id for subscription', true));
+			$this->Session->setFlash(__('Invalid id for subscription'));
 			$this->redirect(array('action'=>'index'));
 		}
 		if ($this->Subscription->delete($id)) {
-			$this->Session->setFlash(__('Subscription deleted', true));
+			$this->Session->setFlash(__('Subscription deleted'));
 			$this->redirect(array('action'=>'index'));
 		}
-		$this->Session->setFlash(__('Subscription was not deleted', true));
+		$this->Session->setFlash(__('Subscription was not deleted'));
 		$this->redirect(array('action' => 'index'));
 	}
 }
