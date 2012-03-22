@@ -1,11 +1,11 @@
 <?php
-App::import("Component", "FlyLoader");
-App::import("Lib", "Urg.AbstractWidgetComponent");
-App::import("Component", "ImgLib.ImgLib");
+App::uses("FlyLoaderComponent", "Controller/Component");
+App::uses("AbstractWidgetComponent", "Urg.Lib");
+App::uses("ImgLibComponent", "ImgLib.Controller/Component");
 class NotifySubscribersComponent extends AbstractWidgetComponent {
     var $IMAGES = "/app/plugins/urg_post/webroot/img";
 
-    var $components = array("Email", "ImgLib", "FlyLoader");
+    var $components = array("Email", "ImgLib.ImgLib", "FlyLoader");
 
     var $email_delivery;
 

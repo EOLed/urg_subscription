@@ -1,5 +1,5 @@
 <?php
-App::import("Component", "Urg.Urg");
+App::uses("UrgComponent", "Urg.Controller/Component");
 class UrgSubscriptionAppModel extends AppModel {
     var $components = array(
            "Auth" => array(
@@ -9,7 +9,7 @@ class UrgSubscriptionAppModel extends AppModel {
                            "action" => "login",
                            "admin" => false
                    )
-           ), "Urg"
+           ), "Urg.Urg"
     );
 
     function log($msg, $type = LOG_ERROR) {
