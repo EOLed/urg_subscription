@@ -1,5 +1,6 @@
 <?php
-class SubscriptionsController extends AppController {
+App::uses("UrgAppController", "Urg.Controller");
+class SubscriptionsController extends UrgAppController {
 
 	var $name = 'Subscriptions';
 
@@ -17,9 +18,9 @@ class SubscriptionsController extends AppController {
 	}
 
 	function add() {
-		if (!empty($this->data)) {
+		if (!empty($this->request->data)) {
 			$this->Subscription->create();
-			if ($this->Subscription->save($this->data)) {
+			if ($this->Subscription->save($this->request->data)) {
 				$this->Session->setFlash(__('The subscription has been saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {
@@ -40,10 +41,10 @@ class SubscriptionsController extends AppController {
         $i18n_errors = array();
         $message = null;
 
-		if (!empty($this->data)) {
+		if (!empty($this->request->data)) {
 			$this->Subscription->create();
-            $this->data["Subscription"]["ref"] = String::uuid();
-			if ($this->Subscription->save($this->data)) {
+            $this->request->data["Subscription"]["ref"] = String::uuid();
+			if ($this->Subscription->save($this->request->data)) {
 				$message = __('Thanks for subscribing!');
 			} else {
                 $errors = $this->Subscription->invalidFields();
@@ -65,20 +66,20 @@ class SubscriptionsController extends AppController {
     }
 
 	function edit($id = null) {
-		if (!$id && empty($this->data)) {
+		if (!$id && empty($this->request->data)) {
 			$this->Session->setFlash(__('Invalid subscription'));
 			$this->redirect(array('action' => 'index'));
 		}
-		if (!empty($this->data)) {
-			if ($this->Subscription->save($this->data)) {
+		if (!empty($this->request->data)) {
+			if ($this->Subscription->save($this->request->data)) {
 				$this->Session->setFlash(__('The subscription has been saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The subscription could not be saved. Please, try again.'));
 			}
 		}
-		if (empty($this->data)) {
-			$this->data = $this->Subscription->read(null, $id);
+		if (empty($this->request->data)) {
+			$this->request->data = $this->Subscription->read(null, $id);
 		}
 		$groups = $this->Subscription->Group->find('list');
 		$this->set(compact('groups'));

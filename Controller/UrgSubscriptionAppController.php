@@ -1,3 +1,4 @@
 <?php
-class UrgSubscriptionAppController extends AppController {
+App::uses("UrgAppController", "Urg.Controller");
+class UrgSubscriptionAppController extends UrgAppController {
 }

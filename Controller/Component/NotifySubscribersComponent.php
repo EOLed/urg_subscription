@@ -19,9 +19,9 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
     }
     
     function execute() {
-        $group_id = $this->controller->data["Post"]["group_id"];
+        $group_id = $this->controller->request->data["Post"]["group_id"];
 
-        $banners = $this->get_banners($this->controller->data);
+        $banners = $this->get_banners($this->controller->request->data);
 
         $this->controller->Post->bindModel(array("hasMany" => array(
                 "Subscription" => array(
@@ -43,7 +43,7 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
                 $from = $this->widget_settings["reply_to_name"] . " <$from>";
             }
             $this->controller->Email->from = $from;
-            $this->controller->Email->subject = $this->controller->data["Post"]["title"];
+            $this->controller->Email->subject = $this->controller->request->data["Post"]["title"];
 
             $this->controller->Email->delivery = $this->email_delivery;
             $this->controller->Email->template = "banner";
@@ -58,7 +58,7 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
                 $this->controller->set("banner", $banners[0]);
             }
 
-            $this->controller->set("post", $this->controller->data);
+            $this->controller->set("post", $this->controller->request->data);
 
             $this->controller->set("subscription", $subscription);
 
@@ -77,7 +77,7 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
     }
 
     function get_banners($post) {
-        $this->controller->loadModel("Attachment");
+        $this->controller->loadModel("UrgPost.Attachment");
         $this->controller->Attachment->bindModel(array("belongsTo" => array("AttachmentType")));
 
         $banner_type = $this->controller->Attachment->AttachmentType->findByName("Banner");
