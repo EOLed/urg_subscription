@@ -2,20 +2,16 @@
 App::uses("FlyLoaderComponent", "Controller/Component");
 App::uses("AbstractWidgetComponent", "Urg.Lib");
 App::uses("ImgLibComponent", "ImgLib.Controller/Component");
+App::uses("CakeEmail", "Network/Email");
+App::uses("MarkdownHelper", "Markdown.View/Helper");
 class NotifySubscribersComponent extends AbstractWidgetComponent {
     var $IMAGES = "/app/Plugin/UrgPost/webroot/img";
 
-    var $components = array("Email", "ImgLib.ImgLib", "FlyLoader");
+    var $components = array("ImgLib.ImgLib", "FlyLoader");
 
     var $email_delivery;
 
     function build_widget() {
-        Configure::load("config");
-        $this->email_delivery = Configure::read("Email.delivery");
-
-        if ($this->email_delivery == "" || $this->email_delivery == null) {
-            $this->email_delivery = "mail";
-        }
     }
     
     function execute() {
@@ -35,44 +31,37 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
         Configure::load("config");
 
         foreach ($subscriptions as $subscription) {
-            $this->controller->FlyLoader->load("Helper", "HtmlText");
-            $this->controller->FlyLoader->load("Component", "Email");
-            $this->controller->Email->to = $subscription["Subscription"]["email"];
+            $email = new CakeEmail(Configure::read("Email.config"));
+
+            $email->helpers(array("HtmlText", "Html", "Markdown.Markdown"));
+
             $from = "no-reply@churchie.org";
             if (isset($this->widget_settings["reply_to_name"])) {
-                $from = $this->widget_settings["reply_to_name"] . " <$from>";
+                $from = array($this->widget_settings["reply_to_name"] => $from);
             }
-            $this->controller->Email->from = $from;
-            $this->controller->Email->subject = $this->controller->request->data["Post"]["title"];
 
-            $this->controller->Email->delivery = $this->email_delivery;
-            $this->controller->Email->template = "banner";
+            $email->from($from)
+                  ->to($subscription["Subscription"]["email"])
+                  ->subject($this->controller->request->data["Post"]["title"])
+                  ->template("UrgPost.banner")
+                  ->emailFormat("both");
 
-            $this->controller->Email->sendAs = "both";
 
             if (isset($this->widget_settings["reply_to"])) {
-                $this->controller->Email->replyTo = $this->widget_settings["reply_to"];
+                $email->replyTo($this->widget_settings["reply_to"]);
             }
 
+            $vars = array();
             if (sizeof($banners) > 0) {
-                $this->controller->set("banner", $banners[0]);
+                $vars["banner"] = $banners[0];
             }
 
-            $this->controller->set("post", $this->controller->request->data);
+            $vars["post"] = $this->controller->request->data;
+            $vars["subscription"] = $subscription;
 
-            $this->controller->set("subscription", $subscription);
+            $email->viewVars($vars);
 
-            if ($this->email_delivery == "smtp") {
-                $this->controller->Email->smtpOptions = array(
-                        "port" => Configure::read("Email.smtpPort"),
-                        "timeout" => Configure::read("Email.smtpTimeout"),
-                        "host" => Configure::read("Email.smtpHost"),
-                        "username" => Configure::read("Email.smtpUsername"),
-                        "password" => Configure::read("Email.smtpPassword")
-                );
-            }
-            $this->controller->Email->send();
-            $this->controller->Email->reset();
+            $email->send();
         }
     }
 
