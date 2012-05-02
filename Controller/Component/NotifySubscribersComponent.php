@@ -31,7 +31,9 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
         Configure::load("config");
 
         foreach ($subscriptions as $subscription) {
-            $email = new CakeEmail(Configure::read("Email.config"));
+            $email_config = Configure::read("Email.config");
+
+            $email = $email_config == "default" ? new CakeEmail() : new CakeEmail($email_config);
 
             $email->helpers(array("HtmlText", "Html", "Markdown.Markdown"));
 
