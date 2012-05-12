@@ -7,13 +7,53 @@ App::uses("MarkdownHelper", "Markdown.View/Helper");
 class NotifySubscribersComponent extends AbstractWidgetComponent {
     var $IMAGES = "/app/Plugin/UrgPost/webroot/img";
 
-    var $components = array("ImgLib.ImgLib", "FlyLoader");
+    var $components = array("Session", "ImgLib.ImgLib", "FlyLoader");
 
     var $email_delivery;
+
+    private $__reply_to_cache = array();
 
     function build_widget() {
     }
     
+    function __is_assoc ($arr) {
+        return (is_array($arr) && count(array_filter(array_keys($arr),'is_string')) == count($arr));
+    }
+
+    function __get_sender() {
+        CakeLog::write(LOG_DEBUG, "widget settings to convert to email sender: " . Debugger::exportVar($this->widget_settings, 5));
+        if (!isset($this->widget_settings["reply_to"]))
+            return null;
+
+        $reply_to = $this->widget_settings["reply_to"];
+        
+        if ($this->__is_assoc($reply_to)) {
+            return array("email" => $this->__get_reply_to_val($reply_to["email"]),
+                         "name" => $this->__get_reply_to_val($reply_to["name"]));
+        } else {
+            return $reply_to;
+        }
+    }
+
+    function __get_reply_to_val($key) {
+        $model = $key["model"];
+        $logged_user = $this->Session->read("User");
+
+        $object = null;
+        // if exists, get object from cache
+        if (isset($this->__reply_to_cache[$model][$logged_user["User"]["id"]])) {
+            $object = $this->__reply_to_cache[$model][$logged_user["User"]["id"]];
+        } else {
+            $this->controller->loadModel($model);
+            $object = $this->controller->{$model}->findByUserId($logged_user["User"]["id"]);
+            $this->__reply_to_cache[$model][$logged_user["User"]["id"]] = $object;
+        }
+
+        CakeLog::write(LOG_DEBUG, "the reply to object: " . Debugger::exportVar($object, 5));
+
+        return $object[$model][$key["field"]];
+    }
+
     function execute() {
         $group_id = $this->controller->request->data["Post"]["group_id"];
 
@@ -37,9 +77,22 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
 
             $email->helpers(array("HtmlText", "Html", "Markdown.Markdown"));
 
+            $sender = $this->__get_sender();
+            CakeLog::write(LOG_DEBUG, "email sender: " . Debugger::exportVar($sender, 5));
             $from = "no-reply@churchie.org";
-            if (isset($this->widget_settings["reply_to_name"])) {
-                $from = array($this->widget_settings["reply_to_name"] => $from);
+            if (isset($sender["name"])) {
+                $from = array($sender["email"] => $sender["name"]);
+            } else {
+                if (isset($this->widget_settings["reply_to_name"])) {
+                    $from = array($from => $this->widget_settings["reply_to_name"]);
+                } else {
+                    $logged_user = $this->Session->read("User");
+                    $from = array($from => $logged_user["User"]["username"]);
+                }
+
+                if ($sender != null) {
+                    $email->replyTo($sender["email"]);
+                }
             }
 
             $email->from($from)
@@ -47,11 +100,6 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
                   ->subject($this->controller->request->data["Post"]["title"])
                   ->template("UrgPost.banner")
                   ->emailFormat("both");
-
-
-            if (isset($this->widget_settings["reply_to"])) {
-                $email->replyTo($this->widget_settings["reply_to"]);
-            }
 
             $vars = array();
             if (sizeof($banners) > 0) {
