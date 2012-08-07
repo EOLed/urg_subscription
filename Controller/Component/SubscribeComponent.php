@@ -3,6 +3,10 @@ App::uses("AbstractWidgetComponent", "Urg.Lib");
 class SubscribeComponent extends AbstractWidgetComponent  {
     function build_widget() {
         $settings = $this->widget_settings;
+        if (isset($settings["group_slug"])) {
+            $group = $this->controller->Group->findBySlug($settings["group_slug"]);
+            $settings["group_id"] = $group["Group"]["id"];
+        }
 
         $options = array();
 
