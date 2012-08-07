@@ -70,31 +70,31 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
 
         Configure::load("config");
 
-        foreach ($subscriptions as $subscription) {
-            $email_config = Configure::read("Email.config");
+        $email_config = Configure::read("Email.config");
 
-            $email = $email_config == "default" ? new CakeEmail() : new CakeEmail($email_config);
+        $email = $email_config == "default" ? new CakeEmail() : new CakeEmail($email_config);
 
-            $email->helpers(array("HtmlText", "Html", "Markdown.Markdown"));
+        $email->helpers(array("HtmlText", "Html", "Markdown.Markdown"));
 
-            $sender = $this->__get_sender();
-            CakeLog::write(LOG_DEBUG, "email sender: " . Debugger::exportVar($sender, 5));
-            $from = "no-reply@churchie.org";
-            if (isset($sender["name"])) {
-                $from = array($sender["email"] => $sender["name"]);
+        $sender = $this->__get_sender();
+        CakeLog::write(LOG_DEBUG, "email sender: " . Debugger::exportVar($sender, 5));
+        $from = "no-reply@churchie.org";
+        if (isset($sender["name"])) {
+            $from = array($sender["email"] => $sender["name"]);
+        } else {
+            if (isset($this->widget_settings["reply_to_name"])) {
+                $from = array($from => $this->widget_settings["reply_to_name"]);
             } else {
-                if (isset($this->widget_settings["reply_to_name"])) {
-                    $from = array($from => $this->widget_settings["reply_to_name"]);
-                } else {
-                    $logged_user = $this->Session->read("User");
-                    $from = array($from => $logged_user["User"]["username"]);
-                }
-
-                if ($sender != null) {
-                    $email->replyTo($sender["email"]);
-                }
+                $logged_user = $this->Session->read("User");
+                $from = array($from => $logged_user["User"]["username"]);
             }
 
+            if ($sender != null) {
+                $email->replyTo($sender["email"]);
+            }
+        }
+
+        foreach ($subscriptions as $subscription) {
             $email->from($from)
                   ->to($subscription["Subscription"]["email"])
                   ->subject($this->controller->request->data["Post"]["title"])
@@ -111,6 +111,18 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
 
             $email->viewVars($vars);
 
+            $email->send();
+        }
+
+        foreach ($this->widget_settings["facebook_groups"] as $fb_group) {
+            $email->from($from)
+                  ->to($fb_group)
+                  ->subject($this->controller->request->data["Post"]["title"])
+                  ->template("UrgPost.fb")
+                  ->emailFormat("text");
+
+            $vars = array("post" => $this->controller->request->data);
+            $email->viewVars($vars);
             $email->send();
         }
     }
