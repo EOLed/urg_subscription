@@ -114,16 +114,18 @@ class NotifySubscribersComponent extends AbstractWidgetComponent {
             $email->send();
         }
 
-        foreach ($this->widget_settings["facebook_groups"] as $fb_group) {
-            $email->from($from)
-                  ->to($fb_group)
-                  ->subject($this->controller->request->data["Post"]["title"])
-                  ->template("UrgPost.fb")
-                  ->emailFormat("text");
+        if (isset($this->widget_settings["facebook_groups"])) {
+          foreach ($this->widget_settings["facebook_groups"] as $fb_group) {
+              $email->from($from)
+                    ->to($fb_group)
+                    ->subject($this->controller->request->data["Post"]["title"])
+                    ->template("UrgPost.fb")
+                    ->emailFormat("text");
 
-            $vars = array("post" => $this->controller->request->data);
-            $email->viewVars($vars);
-            $email->send();
+              $vars = array("post" => $this->controller->request->data);
+              $email->viewVars($vars);
+              $email->send();
+          }
         }
     }
 
